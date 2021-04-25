@@ -6,6 +6,7 @@ TagManager:
   tags:
   - HurtEnvironment
   - HurtPlayer
+  - HurtEnemy
   layers:
   - Default
   - TransparentFX

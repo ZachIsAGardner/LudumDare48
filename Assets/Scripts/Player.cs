@@ -28,7 +28,7 @@ public enum PlayerState
     Heal
 }
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IHurter
 {
     private Rigidbody rigidbody;
     private CapsuleCollider collider;
@@ -212,6 +212,7 @@ public class Player : MonoBehaviour
     {
         canGoToNextAttack = false;
         queueAttack = false;
+        animator.speed = 1;
     }
 
     void DodgeStart()
@@ -373,7 +374,10 @@ public class Player : MonoBehaviour
 
         update();
 
-        potionCountUi.text = $"Potions: {potionCount}";
+        if (potionCountUi != null)
+        {
+            potionCountUi.text = $"Potions: {potionCount}";
+        }
 
         if (liver.Health <= 0)
         {
@@ -386,10 +390,9 @@ public class Player : MonoBehaviour
 
     public void LandedHit(GameObject other)
     {
-        float originalSpeed = animator.speed;
         animator.speed = 0;
         Timer.Create(0.1f, () => {
-            animator.speed = originalSpeed;
+            animator.speed = 1f;
         });
     }
 
@@ -540,11 +543,11 @@ public class Player : MonoBehaviour
     {
         if (liver.IsInvincible || isDodgeInvincible) return;
 
-        if (other.CompareTag("HurtEnvironment"))
+        if (other.CompareTag("HurtEnvironment") || other.CompareTag("HurtEnemy"))
         {
             ChangeState(PlayerState.Hurt);
             Instantiate(Prefabs.Instance.HitEffect, transform.transform.position, Quaternion.identity);
-            liver.TakeDamage(1);
+            liver.TakeDamage(1, other.gameObject);
         }
     }
 

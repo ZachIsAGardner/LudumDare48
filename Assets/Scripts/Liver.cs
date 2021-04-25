@@ -38,11 +38,21 @@ public class Liver : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage = 1)
+    public void TakeDamage(int damage = 1, GameObject other = null)
     {
         if (IsInvincible) return;
         Health -= damage;
         IsInvincible = true;
         invincibilityTime = InvincibilityDuration;
+
+        if (other)
+        {
+            IHurter hurter = other.GetComponent<IHurter>();
+
+            if (hurter != null)
+            {
+                hurter.LandedHit(gameObject);
+            }
+        }
     }
 }
