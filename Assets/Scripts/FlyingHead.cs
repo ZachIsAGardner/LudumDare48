@@ -23,6 +23,10 @@ public class FlyingHead : MonoBehaviour
 {
     public float Speed = 10;
 
+    public GameObject hpTarget;
+    GameObject healthUi;
+    Timer healthUiTimer;
+
     float attackCooldown = 0;
     float retreatTime = 0;
 
@@ -149,7 +153,7 @@ public class FlyingHead : MonoBehaviour
 
     void HurtUpdate()
     {
-        
+
     }
 
     void HurtExit()
@@ -167,6 +171,12 @@ public class FlyingHead : MonoBehaviour
 
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
 
+        healthUi = Instantiate(Prefabs.Get("EnemyHP"), GameObject.FindGameObjectWithTag("Canvas").transform);
+        healthUi.GetComponent<UiFollow>().target = hpTarget.transform;
+        healthUi.SetActive(false);
+        liver.SetUi(healthUi.GetComponentInChildren<HpBar>().GetComponent<RectTransform>());
+
+
         start = IdleStart;
         update = IdleUpdate;
         exit = IdleExit;
@@ -180,7 +190,8 @@ public class FlyingHead : MonoBehaviour
 
         if (liver != null && liver.Health <= 0)
         {
-            Instantiate(Prefabs.Instance.HitEffect, transform.transform.position, Quaternion.identity);
+            Instantiate(Prefabs.Get("HitEffect"), transform.transform.position, Quaternion.identity);
+            if (healthUi != null) Destroy(healthUi);
             Destroy(gameObject);
         }
     }
@@ -208,11 +219,22 @@ public class FlyingHead : MonoBehaviour
             ChangeState(FlyingHeadState.Hurt);
 
             liver.TakeDamage(1);
-            Instantiate(Prefabs.Instance.HitEffect, transform.transform.position, Quaternion.identity);
+            Instantiate(Prefabs.Get("HitEffect"), transform.transform.position, Quaternion.identity);
             Vector3 direction = other.transform.position - transform.position;
             direction.y = 0;
             direction.Normalize();
             rigidbody.AddForce(-direction * 450);
+
+            if (healthUi != null)
+            {
+                healthUi.SetActive(true);
+                if (healthUiTimer != null) Destroy(healthUiTimer.gameObject);
+                healthUiTimer = Timer.Create(1f, () =>
+                {
+                    if (healthUi != null)
+                        healthUi.SetActive(false);
+                });
+            }
         }
     }
 
@@ -265,8 +287,9 @@ public class FlyingHead : MonoBehaviour
     {
         Vector3 direction = player.transform.position - transform.position;
         direction.Normalize();
-        Rigidbody instance = Instantiate(Prefabs.Instance.Bullet, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
+        Rigidbody instance = Instantiate(Prefabs.Get("Bullet"), transform.position, Quaternion.identity).GetComponent<Rigidbody>();
         instance.velocity = direction * 10;
+        Sounds.Play("Cough", transform.position);
     }
 
     void HurtEnd()

@@ -17,7 +17,7 @@ public class Destructable : MonoBehaviour
     {
         if (liver != null && liver.Health <= 0)
         {
-            Instantiate(Prefabs.Instance.HitEffect, transform.transform.position, Quaternion.identity);
+            Instantiate(Prefabs.Get("HitEffect"), transform.transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
     }
@@ -34,7 +34,7 @@ public class Destructable : MonoBehaviour
                 player.LandedHit(gameObject);
             }
             liver.TakeDamage(1);
-            Instantiate(Prefabs.Instance.HitEffect, transform.transform.position, Quaternion.identity);
+            Instantiate(Prefabs.Get("HitEffect"), transform.transform.position, Quaternion.identity);
             Vector3 direction = other.transform.position - transform.position;
             direction.Normalize();
             rigidbody.AddForce(-direction * 450);

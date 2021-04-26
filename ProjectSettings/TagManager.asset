@@ -7,6 +7,12 @@ TagManager:
   - HurtEnvironment
   - HurtPlayer
   - HurtEnemy
+  - PromptTarget
+  - Canvas
+  - PlayerUiPanel
+  - PotionUiText
+  - Wall
+  - Ground
   layers:
   - Default
   - TransparentFX

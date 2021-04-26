@@ -13,12 +13,20 @@ public class Mushroom : MonoBehaviour
     int animationState = 1;
 
     public bool Diagonol = false;
+    public GameObject hpTarget;
+    GameObject healthUi;
+    Timer healthUiTimer;
 
     void Start()
     {
         liver = GetComponent<Liver>();
         rigidbody = GetComponent<Rigidbody>();
         animator = GetComponentInChildren<Animator>();
+
+        healthUi = Instantiate(Prefabs.Get("EnemyHP"), GameObject.FindGameObjectWithTag("Canvas").transform);
+        healthUi.GetComponent<UiFollow>().target = hpTarget.transform;
+        healthUi.SetActive(false);
+        liver.SetUi(healthUi.GetComponentInChildren<HpBar>().GetComponent<RectTransform>());
     }
 
     void Update()
@@ -38,7 +46,8 @@ public class Mushroom : MonoBehaviour
 
         if (liver != null && liver.Health <= 0)
         {
-            Instantiate(Prefabs.Instance.HitEffect, transform.transform.position, Quaternion.identity);
+            Instantiate(Prefabs.Get("HitEffect"), transform.transform.position, Quaternion.identity);
+            if (healthUi != null) Destroy(healthUi);
             Destroy(gameObject);
         }
     }
@@ -61,9 +70,11 @@ public class Mushroom : MonoBehaviour
             new Vector3(-1, 0, -1),
         };
 
+        Sounds.Play("Cough", transform.position);
+
         foreach (Vector3 direction in directions)
         {
-            Rigidbody instance = Instantiate(Prefabs.Instance.Bullet, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
+            Rigidbody instance = Instantiate(Prefabs.Get("Bullet"), transform.position, Quaternion.identity).GetComponent<Rigidbody>();
             instance.velocity = direction * 10;
         }
     }
@@ -100,10 +111,21 @@ public class Mushroom : MonoBehaviour
             animationState = 3;
 
             liver.TakeDamage(1);
-            Instantiate(Prefabs.Instance.HitEffect, transform.transform.position, Quaternion.identity);
+            Instantiate(Prefabs.Get("HitEffect"), transform.transform.position, Quaternion.identity);
             Vector3 direction = other.transform.position - transform.position;
             direction.Normalize();
             rigidbody.AddForce(-direction * 450);
+
+            if (healthUi != null)
+            {
+                healthUi.SetActive(true);
+                if (healthUiTimer != null) Destroy(healthUiTimer.gameObject);
+                healthUiTimer = Timer.Create(1f, () =>
+                {
+                    if (healthUi != null)
+                        healthUi.SetActive(false);
+                });
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum PlayerAnimationState
 {
@@ -51,7 +52,7 @@ public class Player : MonoBehaviour, IHurter
     private float dodgeTime = 0;
     private bool isGrounded = false;
     private bool isDodgeInvincible = false;
-    private float potionCount = 3;
+    public int potionCount = 0;
 
     public float Speed = 10;
     public float Acceleration = 0.001f;
@@ -63,6 +64,9 @@ public class Player : MonoBehaviour, IHurter
     private Action start;
     private Action update;
     private Action exit;
+
+    float fallTime;
+    Timer fallTimer;
 
     // NORMAL
 
@@ -336,6 +340,11 @@ public class Player : MonoBehaviour, IHurter
 
     void HealUpdate()
     {
+        rigidbody.velocity = new Vector3(
+            rigidbody.velocity.x,
+            rigidbody.velocity.y - (Gravity * Time.deltaTime),
+            rigidbody.velocity.z
+        );
     }
 
     void HealExit()
@@ -356,9 +365,26 @@ public class Player : MonoBehaviour, IHurter
         camera = Camera.main.transform;
         startGravity = Gravity;
 
+        liver.Health = Game.PlayerHealth ?? liver.Health;
+        potionCount = Game.PotionCount ?? potionCount;
+
+        if (SceneManager.GetActiveScene().name != "OutsideCave")
+        {
+            var ui = Instantiate(Prefabs.Get("PlayerUi"), GameObject.FindGameObjectWithTag("Canvas").transform);
+
+            liver.SetUi(GameObject.FindGameObjectWithTag("PlayerUiPanel").GetComponent<RectTransform>());
+            potionCountUi = GameObject.FindGameObjectWithTag("PotionUiText").GetComponent<TextMeshProUGUI>();
+        }
+
         start = NormalStart;
         update = NormalUpdate;
         exit = NormalExit;
+
+        if (Game.spawnPosition != null)
+        {
+            transform.position = Game.spawnPosition.Value;
+            Game.spawnPosition = null;
+        }
     }
 
     void FixedUpdate()
@@ -381,17 +407,64 @@ public class Player : MonoBehaviour, IHurter
 
         if (liver.Health <= 0)
         {
-            Instantiate(Prefabs.Instance.HitEffect, transform.transform.position, Quaternion.identity);
-            Destroy(gameObject);
+            Die();
+        }
+
+        if (!isGrounded)
+        {
+            fallTime += Time.deltaTime;
+        }
+        else
+        {
+            fallTime = 0;
+        }
+
+        if (fallTime > 1.25f && fallTimer == null)
+        {
+            Follow follow = Camera.main.GetComponent<Follow>();
+
+            if (follow != null)
+            {
+                follow.follow = null;
+                fallTimer = Timer.Create(0.5f, () =>
+                {
+                    Die();
+                });
+            }
+            else
+            {
+                Die();
+            }
         }
     }
 
     // ---
 
+    void Die()
+    {
+        Game.PlayerHealth = null;
+        Game.PotionCount = null;
+        Instantiate(Prefabs.Get("HitEffect"), transform.transform.position, Quaternion.identity);
+        Destroy(gameObject);
+
+        Timer.Create(1f, () =>
+        {
+            if (Game.SavePoint != null)
+            {
+                _ = Game.LoadAsync(Game.SavePoint.Scene, Prefabs.Get<SceneTransition>("FadeSceneTransition"), null, Game.SavePoint.Position);
+            }
+            else
+            {
+                _ = Game.LoadAsync(SceneManager.GetActiveScene().name, Prefabs.Get<SceneTransition>("FadeSceneTransition"));
+            }
+        });
+    }
+
     public void LandedHit(GameObject other)
     {
         animator.speed = 0;
-        Timer.Create(0.1f, () => {
+        Timer.Create(0.1f, () =>
+        {
             animator.speed = 1f;
         });
     }
@@ -493,41 +566,11 @@ public class Player : MonoBehaviour, IHurter
                 {
                     slopeCount++;
 
-                    if (slopeCount > 30)
-                    {
-                        print("SLOPE");
-                        collider.material.dynamicFriction = 0;
-                        Gravity = startGravity * 5;
-                        isGrounded = false;
-                    }
-                }
-                else
-                {
-                    slopeCount = 0;
-                }
-            }
-        }
-    }
-
-    void OnCollisionExit(Collision collisionInfo)
-    {
-        // Debug-draw all contact points and normals
-        foreach (ContactPoint contact in collisionInfo.contacts)
-        {
-            Debug.DrawRay(contact.point, contact.normal, Color.red);
-
-            if (contact.point.y - 0.1f <= transform.position.y - collider.height / 2f)
-            {
-                isGrounded = false;
-
-                if (Math.Abs(contact.normal.x) > 0.5f || Math.Abs(contact.normal.z) > 0.5f)
-                {
-                    slopeCount++;
-
-                    if (slopeCount > 30)
+                    if (slopeCount > 50)
                     {
                         collider.material.dynamicFriction = 0;
-                        Gravity = startGravity * 5;
+                        Gravity = startGravity * 10;
+                        rigidbody.AddForce(contact.normal * 1000);
                         isGrounded = false;
                     }
                 }
@@ -546,12 +589,18 @@ public class Player : MonoBehaviour, IHurter
         if (other.CompareTag("HurtEnvironment") || other.CompareTag("HurtEnemy"))
         {
             ChangeState(PlayerState.Hurt);
-            Instantiate(Prefabs.Instance.HitEffect, transform.transform.position, Quaternion.identity);
+            Instantiate(Prefabs.Get("HitEffect"), transform.transform.position, Quaternion.identity);
             liver.TakeDamage(1, other.gameObject);
+            Game.PlayerHealth = liver.Health;
         }
     }
 
     // Animation Events
+
+    void PlaySound(string name)
+    {
+        Sounds.Play(name);
+    }
 
     private void AttackEnd(int parameter = 0)
     {
@@ -611,6 +660,7 @@ public class Player : MonoBehaviour, IHurter
         {
             liver.Health = liver.MaxHealth;
             potionCount -= 1;
+            Game.PotionCount = potionCount;
         }
         else if (parameter == 1)
         {

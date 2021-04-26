@@ -4,5 +4,17 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/OutsideCave/OutsideCave.unity
+    guid: b61e26dfdf35a034496d4c00c0bc29f8
+  - enabled: 1
+    path: Assets/Scenes/Cave/Cave.unity
+    guid: b6f4b38da8012934299c68883dd80d7c
+  - enabled: 1
+    path: Assets/Scenes/Boss/Boss.unity
+    guid: 0134dcc080210794b809c72f46ee653a
+  - enabled: 1
+    path: Assets/Scenes/Thanks/Thanks.unity
+    guid: 090645ec28c6a5a44920fbb100983dc2
   m_configObjects: {}

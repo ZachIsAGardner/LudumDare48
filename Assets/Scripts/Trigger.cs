@@ -5,16 +5,25 @@ using UnityEngine;
 
 public class Trigger : MonoBehaviour
 {
+    public Action<Collider> OnEnter;
     public Action<Collider> OnStay;
-    private Liver liver;
+    public Action<Collider> OnExit;
 
-    void Start()
+    private void OnTriggerEnter(Collider other)
     {
-        liver = GetComponentInParent<Liver>();
+        if (OnEnter != null)
+            OnEnter(other);
     }
 
     private void OnTriggerStay(Collider other)
     {
-        OnStay(other);
+        if (OnStay != null)
+            OnStay(other);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (OnExit != null)
+            OnExit(other);
     }
 }

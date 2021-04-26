@@ -8,4 +8,12 @@ public class Bullet : MonoBehaviour, IHurter
     {
         Destroy(gameObject);
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Ground"))
+        {
+            Destroy(gameObject);
+        }
+    }
 }

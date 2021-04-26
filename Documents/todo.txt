@@ -1,0 +1,19 @@
+TODO
+- transitions
+- mid level
+- ladder
+- sign text
+- boss
+- "thanks for playing"
+- checkpoint
+
+- export
+    - windows
+    - mac
+    - linux
+    - web
+
+BONUS
+- flying barrel
+- flying sword
+- skeleton

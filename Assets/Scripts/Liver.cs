@@ -13,6 +13,12 @@ public class Liver : MonoBehaviour
     private float startUiWidth;
     private float invincibilityTime = 0;
 
+    public void SetUi(RectTransform ui)
+    {
+        this.Ui = ui;
+        startUiWidth = ui.sizeDelta.x;
+    }
+
     void Start()
     {
         if (Ui != null)
@@ -44,6 +50,7 @@ public class Liver : MonoBehaviour
         Health -= damage;
         IsInvincible = true;
         invincibilityTime = InvincibilityDuration;
+        Sounds.Play("Hit");
 
         if (other)
         {

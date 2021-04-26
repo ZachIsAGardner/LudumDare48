@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &420269622451222557
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8215511073192005624}
+  m_Layer: 0
+  m_Name: Prompt
+  m_TagString: PromptTarget
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8215511073192005624
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420269622451222557}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.886, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 664451544214453783}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &664451543738827473
 GameObject:
   m_ObjectHideFlags: 0
@@ -4903,7 +4933,7 @@ GameObject:
   - component: {fileID: 664451544214453879}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4922,6 +4952,7 @@ Transform:
   - {fileID: 2919639686014739359}
   - {fileID: 2919639685819171700}
   - {fileID: 2919639684832783630}
+  - {fileID: 8215511073192005624}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5000,6 +5031,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3051abc1aab31fa4c83701b85ad9ab3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  potionCount: 3
   Speed: 14
   Acceleration: 0.001
   Gravity: 38
@@ -5053,8 +5085,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98f8112c44f752f43afcbe55ec4d62bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxHealth: 8
-  Health: 6
+  MaxHealth: 5
+  Health: 5
   IsInvincible: 0
   InvincibilityDuration: 1
   Ui: {fileID: 0}
@@ -5101,8 +5133,8 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 0.6412373, b: 0, a: 1}
-  m_Intensity: 0.8
-  m_Range: 16
+  m_Intensity: 1
+  m_Range: 20
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
