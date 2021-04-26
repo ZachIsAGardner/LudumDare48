@@ -52,6 +52,8 @@ public class Boss : MonoBehaviour
         // 0
 
         var textbox = Instantiate(Prefabs.Get("TextBox"), GameObject.FindGameObjectWithTag("Canvas").transform).GetComponentInChildren<TextMeshProUGUI>();
+        var prompt = GameObject.FindGameObjectWithTag("Prompt");
+        prompt.SetActive(false);
 
         // 1
 
@@ -61,6 +63,8 @@ public class Boss : MonoBehaviour
         Camera.main.GetComponent<Follow>().follow = null;
         target = position1;
 
+        await new WaitForSeconds(0.5f);
+        prompt.SetActive(true);
         while (true)
         {
             if (Game.ProceedText())
@@ -127,6 +131,8 @@ public class Boss : MonoBehaviour
         // 0
 
         var textbox = Instantiate(Prefabs.Get("TextBox"), GameObject.FindGameObjectWithTag("Canvas").transform).GetComponentInChildren<TextMeshProUGUI>();
+        var prompt = GameObject.FindGameObjectWithTag("Prompt");
+        prompt.SetActive(false);
 
         skull.GetComponent<Animator>().SetInteger("State", 2);
         skull.GetComponent<Rigidbody>().useGravity = true;
@@ -140,6 +146,8 @@ public class Boss : MonoBehaviour
         Camera.main.GetComponent<Follow>().follow = null;
         target = position1;
 
+        await new WaitForSeconds(0.5f);
+        prompt.SetActive(true);
         while (true)
         {
             if (Game.ProceedText())
